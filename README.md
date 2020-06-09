@@ -49,6 +49,29 @@ const App = () => {
 };
 ```
 
+### Bring your own ref!
+
+```tsx
+import { useOutsideClickListener } from 'react-clicks-without-borders';
+
+const App = () => {
+  const ref = React.useRef();
+  useOutsideClickListener(
+    () => {
+      console.log('Hey, you can close the Popup now');
+    },
+    { ref },
+  );
+
+  return (
+    <div id="app">
+      <span ref={ref}> Some Popup, Nav or anything </span>
+      <div id="rest-of-the-app">Don't name a div like that :(</div>
+    </div>
+  );
+};
+```
+
 ### Use it's div
 
 ```tsx
