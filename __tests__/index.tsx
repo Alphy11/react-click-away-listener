@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import OutsideClickListener from '../src';
+import OutsideClickListener, { useOutsideClickListener } from '../src';
 
-describe('ClickAway Listener', () => {
-  it('should render properly', () => {
+describe('Outside Click Listener', () => {
+  it('should render children', () => {
     const { getByText } = render(
       <OutsideClickListener onClickAway={() => null}>
         Hello World
@@ -183,8 +183,11 @@ describe('ClickAway Listener', () => {
         </OutsideClickListener>
       </>,
     );
-    jest.spyOn(document, 'addEventListener');
-    jest.spyOn(document, 'removeEventListener');
+    const spies = [
+      jest.spyOn(document, 'addEventListener'),
+      jest.spyOn(document, 'removeEventListener'),
+    ];
+
     rerender(
       <>
         <OutsideClickListener onClickAway={handler} mouseEvent="mouseup">
@@ -195,7 +198,28 @@ describe('ClickAway Listener', () => {
 
     expect(document.addEventListener).toHaveBeenCalled();
     expect(document.removeEventListener).toHaveBeenCalled();
-    (document.addEventListener as ReturnType<typeof jest.fn>).mockReset();
-    (document.removeEventListener as ReturnType<typeof jest.fn>).mockReset();
+    spies.forEach((spy) => spy.mockRestore());
+  });
+
+  it('allows you to bring your own ref', () => {
+    function RefTest({ onClickAway, children }: any) {
+      const ref = React.useRef<HTMLDivElement>(null);
+      useOutsideClickListener(onClickAway, { ref });
+      return <div ref={ref}>{children}</div>;
+    }
+
+    const fakeHandleClick = jest.fn();
+    const { getByText } = render(
+      <React.Fragment>
+        <RefTest onClickAway={fakeHandleClick}>Hello World</RefTest>
+        <button>A button</button>
+        <p>A text element</p>
+      </React.Fragment>,
+    );
+
+    fireEvent.click(getByText(/A button/i));
+    fireEvent.click(getByText(/Hello World/i));
+    fireEvent.click(getByText(/A text element/i));
+    expect(fakeHandleClick).toBeCalledTimes(2);
   });
 });
