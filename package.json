@@ -1,6 +1,6 @@
 {
   "name": "react-clicks-without-borders",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple click away listener in a react hook",
   "main": "dist/react-clicks-without-borders.js",
   "module": "dist/react-clicks-without-borders.es.js",
